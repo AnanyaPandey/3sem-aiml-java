@@ -134,6 +134,47 @@ System.out.println(arr1[0]); // prints 99!
 
 ------
 
+# Primitive vs Non-Primitive Data Types
+
+## Primitive Data Types
+
+- Store the actual value directly in memory
+- Fixed, predefined types built into the language
+- Fixed size (depends on type)
+- Faster to access
+- Default values exist (e.g., 0 for int, false for boolean)
+- Examples in Java: `int`, `float`, `double`, `char`, `boolean`, `byte`, `short`, `long`
+
+**Example:**
+```java
+int a = 10;   // 'a' directly holds the value 10
+```
+
+## Non-Primitive (Reference) Data Types
+
+- Store a reference (memory address) pointing to the actual object, not the value itself
+- Created by the programmer or built from classes (not built into the language core)
+- Size varies, depends on the object
+- Slightly slower to access (extra step to follow the reference)
+- Default value is `null`
+- Examples in Java: `String`, `Array`, `Class`, `Interface`, `Object`
+
+**Example:**
+```java
+String s = "Hello";   // 's' holds a reference to a String object
+```
+
+## Key Differences
+
+| Point | Primitive | Non-Primitive |
+|---|---|---|
+| Stores | Actual value | Reference/address |
+| Defined by | Language | Programmer/class |
+| Size | Fixed | Varies |
+| Default value | 0, false, etc. | null |
+| Speed | Faster | Slower |
+| Example | int, char, boolean | String, Array, Object |
+
 ## 8. Exercises
 
 1. Write a program that declares one variable of each primitive type, prints its value, and prints its size using `Type.SIZE` (in bits) or `Type.BYTES` (e.g., `Integer.SIZE`, `Integer.BYTES`).

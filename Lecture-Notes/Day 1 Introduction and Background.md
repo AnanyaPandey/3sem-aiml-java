@@ -91,7 +91,7 @@ Unlike C or C++ which compile directly to machine code, Java uses a two-step pro
 2. **Compilation:** The Java compiler (`javac`) processes the `.java` file. Instead of machine code, it generates an intermediate, platform-independent code called **Bytecode**. This is saved as a `HelloWorld.class` file.
 3. **Execution/Interpretation:** The JVM reads the `.class` file (Bytecode) line by line, translates it into native machine code for the specific operating system, and executes it.
 
-![image-20260726001753527](Images\Daily_Discipline_Routine.pdf)
+![image-20260726001753527](Images/Daily_Discipline_Routine.pdf)
 
 ## How does a java Program Run ?
 

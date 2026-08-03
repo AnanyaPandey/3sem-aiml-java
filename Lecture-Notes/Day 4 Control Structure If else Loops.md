@@ -230,71 +230,6 @@ Prints `1 2 4 5` — when `i == 3`, that single iteration is skipped, but the lo
 9. Write a program to calculate factorial of a given number ?
 10. Write a program to check if entered number is palindrome ?
 
-### Do all your methods have to be static?
-
-**Only if you're calling them directly from `main` without creating an object first** — which is exactly what you've been doing so far in all your practice programs. That's the specific situation, not a universal Java rule. In Java everything is on object so if you want to call a function without creating an object of it you need to call it static.
-
-```java
-public class Demo {
-    public static void main(String[] args) {
-        square(5);  // calling directly, no object created → square must be static
-    }
-
-    public static int square(int num) {
-        return num * num;
-    }
-}
-```
-
-### Can you "discard" static and still call it directly from main?
-
-No — if you remove `static` from `square`, this breaks:
-
-```java
-public class Demo {
-    public static void main(String[] args) {
-        int result = square(5); // ERROR — can't call non-static method without an object
-    }
-
-    public int square(int num) {  // static removed
-        return num * num;
-    }
-}
-```
-
-Java will refuse to compile this, because `square` is now an **instance method** — it belongs to individual objects, not the class itself. Since `main` is static and runs before any object exists, it has no object to call `square` through.
-
-### The actual way around it — create an object first
-
-```java
-public class Demo {
-    public static void main(String[] args) {
-        Demo d = new Demo();       // create an object
-        int result = d.square(5);  // now call through the object
-        System.out.println(result);
-    }
-
-    public int square(int num) {   // non-static is fine now
-        return num * num;
-    }
-}
-```
-
-This now works, because `square` is being called **through an object** (`d`), not directly by name. This is actually the more common, more "proper OOP" way of writing things — where most of your real class methods will be non-static, and only `main` stays static as the entry point.
-
-### So what does `static` actually mean, one more time, simply
-
-**`static` = "belongs to the class as a whole, usable without needing any object."**
- **non-static (instance) = "belongs to a specific object, only usable after creating one with `new`."**
-
-You've been writing everything `static` so far purely because it was the simplest way to call methods directly from `main` while you were still learning syntax basics (loops, conditions, methods) — before objects were introduced. That was a reasonable teaching shortcut for that stage.
-
-**Now that you're moving into proper OOP (classes, objects, encapsulation)**, the natural shift is: your class's real methods become **non-static**, and you create an object in `main` to use them — which is exactly the pattern we used in the encapsulation and constructor examples (`BankAccount acc = new BankAccount(); acc.deposit(1000);`).
-
-### One-line takeaway
-
-Don't think of it as "discarding" static — think of it as: **static was the training-wheels approach for early lessons; non-static + objects is the real OOP approach**, and you'll naturally use non-static methods more and more as you get deeper into classes and objects.
-
 ### Printing Patterns
 
 <img src="Images\pattern1.jpg" alt="image-20260802223535603" style="zoom:25%;" />
@@ -304,6 +239,97 @@ for (int i =1;i<=5;i++) {
     for (int j=1;j<=5;j++) {
         System.out.printf("%d ",j);
     }
+    System.out.printlm("");
+}
+```
+
+<img src="Images\pattern2.jpg" alt="image-20260802224301996" style="zoom:25%;" />
+
+```java
+for (int i =1;i<=5;i++) {
+    for (int j=1;j<=5;j++) {
+        System.out.printf("%d ",i+j);
+    }
+    System.out.printlm("");
+}
+```
+
+<img src="A:\3sem-aiml-java\Lecture-Notes\Images\pattern3.jpg" alt="image-20260802224447791" style="zoom:25%;" />
+
+```java
+int count=1;
+for (int i =1;i<=5;i++) {
+    for (int j=1;j<=5;j++) {
+        System.out.printf("%d ",count);
+        count++;
+    }
+    System.out.printlm("");
+}
+```
+
+<img src="A:\3sem-aiml-java\Lecture-Notes\Images\pattern4.jpg" alt="image-20260802224636527" style="zoom:25%;" />
+
+```java
+for (int i =1;i<=5;i++) {
+    for (int j=1;j<=i;j++) {
+        System.out.printf("%d ",j);
+    }
+    System.out.printlm("");
+}
+```
+
+<img src="Images\pattern5.jpg" alt="image-20260802224848541" style="zoom:25%;" />
+
+```java
+for (int i =1;i<=5;i++) {
+    for (int j=1;j<=5-i+1;j++) {
+        System.out.printf("%d ",j);
+    }
+    System.out.printlm("");
+}
+```
+
+<img src="A:\3sem-aiml-java\Lecture-Notes\Images\pattern6.jpg" alt="image-20260802225625374" style="zoom:25%;" />
+
+```java
+for (int i =1;i<=5;i++) {
+    for (int j=1;j<=5;j++) {
+        if (j > i) {
+            System.out.printf("*");
+        } else {
+            System.out.printf(" ");
+        }
+    }
+    System.out.printlm("");
+}
+```
+
+<img src="A:\3sem-aiml-java\Lecture-Notes\Images\pattern7.jpg" alt="image-20260802230144740" style="zoom:25%;" />
+
+```java
+for (int i =1;i<=5;i++) {
+    for (int j=1;j<=5;j++) {
+        if (j+i > 5) {
+            System.out.printf("*");
+        } else {
+            System.out.printf(" ");
+        }
+    }
+    System.out.printlm("");
+}
+```
+
+<img src="Images\pattern8.jpg" alt="image-20260802230644971" style="zoom:25%;" />
+
+```java
+for (int i =1;i<=5;i++) {
+    for (int j=1;j<=5;j++) {
+
+    }
+    for (int k=1;k<=5;k++) {
+
+    }
+    
     System.out.printlm("");
 }
 ```

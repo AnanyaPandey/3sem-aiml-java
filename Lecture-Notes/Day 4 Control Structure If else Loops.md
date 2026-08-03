@@ -254,7 +254,7 @@ for (int i =1;i<=5;i++) {
 }
 ```
 
-<img src="A:\3sem-aiml-java\Lecture-Notes\Images\pattern3.jpg" alt="image-20260802224447791" style="zoom:25%;" />
+<img src="Images\pattern3.jpg" alt="image-20260802224447791" style="zoom:25%;" />
 
 ```java
 int count=1;
@@ -267,7 +267,7 @@ for (int i =1;i<=5;i++) {
 }
 ```
 
-<img src="A:\3sem-aiml-java\Lecture-Notes\Images\pattern4.jpg" alt="image-20260802224636527" style="zoom:25%;" />
+<img src="Images\pattern4.jpg" alt="image-20260802224636527" style="zoom:25%;" />
 
 ```java
 for (int i =1;i<=5;i++) {
@@ -289,7 +289,7 @@ for (int i =1;i<=5;i++) {
 }
 ```
 
-<img src="A:\3sem-aiml-java\Lecture-Notes\Images\pattern6.jpg" alt="image-20260802225625374" style="zoom:25%;" />
+<img src="Images\pattern6.jpg" alt="image-20260802225625374" style="zoom:25%;" />
 
 ```java
 for (int i =1;i<=5;i++) {
@@ -304,7 +304,7 @@ for (int i =1;i<=5;i++) {
 }
 ```
 
-<img src="A:\3sem-aiml-java\Lecture-Notes\Images\pattern7.jpg" alt="image-20260802230144740" style="zoom:25%;" />
+<img src="Images\pattern7.jpg" alt="image-20260802230144740" style="zoom:25%;" />
 
 ```java
 for (int i =1;i<=5;i++) {

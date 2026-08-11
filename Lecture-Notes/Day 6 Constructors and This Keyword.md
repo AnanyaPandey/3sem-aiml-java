@@ -273,3 +273,183 @@ class Student {
 3. Create a `Car` class with fields `brand` and `speed`, using `this` in the constructor to resolve a naming conflict between parameters and fields.
 4. Create a `Movie` class with three constructors: one with no arguments (default title "Unknown"), one with just a title, and one with title and year — demonstrating constructor overloading.
 5. Modify Exercise 4 so the no-argument and title-only constructors both call the full constructor using `this(...)`, instead of repeating the initialization code.
+
+## 11. Practice Examples
+
+### Rectangle 
+
+```java
+class Rectangle {
+    double length;
+    double width;
+
+    Rectangle(double length, double width) {
+        this.length = length;
+        this.width = width;
+    }
+
+    double calculateArea() {
+        return length * width;
+    }
+
+    double calculatePerimeter() {
+        return 2 * (length + width);
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Rectangle r1 = new Rectangle(5.0, 3.0);
+        System.out.println("Area: " + r1.calculateArea());
+        System.out.println("Perimeter: " + r1.calculatePerimeter());
+    }
+}
+```
+
+### Array Of Objects
+
+```java
+class Employee {
+    String name;
+    double salary;
+
+    Employee(String name, double salary) {
+        this.name = name;
+        this.salary = salary;
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Employee[] employees = new Employee[3];
+        employees[0] = new Employee("Anita", 45000);
+        employees[1] = new Employee("Suresh", 52000);
+        employees[2] = new Employee("Priya", 60000);
+
+        for (Employee e : employees) {
+            System.out.println(e.name + ": Rs." + e.salary);
+        }
+    }
+}
+```
+
+## 12. Destructors 
+
+## 12.1. What is a Destructor?
+
+A destructor is a special method that is automatically called when an object is destroyed, used to release resources (memory, file handles, network connections, etc.) that the object was holding.
+
+- In languages like **C++**, destructors are a core language feature.
+- **Java does NOT have destructors.** Java relies on automatic garbage collection instead of manual object destruction.
+
+------
+
+## 12.2. Why Java Has No Destructors
+
+Java manages memory automatically through the **Garbage Collector (GC)**, which runs in the background and reclaims memory from objects that are no longer reachable/referenced by the program.
+
+Since the programmer never manually allocates or frees memory (unlike C++'s `new`/`delete`), there is no need for a destructor to explicitly release memory.
+
+------
+
+## 12.3. Comparison: C++ Destructor vs Java
+
+| Aspect              | C++                                                          | Java                                                        |
+| ------------------- | ------------------------------------------------------------ | ----------------------------------------------------------- |
+| Destructor syntax   | `~ClassName()`                                               | Not available                                               |
+| Memory management   | Manual (programmer uses `new` and `delete`)                  | Automatic (Garbage Collector)                               |
+| When called         | Deterministic — called immediately when object goes out of scope or `delete` is used | N/A (no equivalent guarantee)                               |
+| Purpose             | Free memory, close resources, custom cleanup                 | Not needed for memory; resource cleanup handled differently |
+| Control over timing | Full control                                                 | No control — GC decides when/if to run                      |
+
+### Example — C++ Destructor
+
+```cpp
+class Demo {
+public:
+    ~Demo() {
+        cout << "Destructor called" << endl;
+    }
+};
+
+int main() {
+    Demo d;
+} // Destructor called automatically here
+```
+
+------
+
+## 12.4. Java's Old Attempt: `finalize()` (Deprecated — Do Not Use)
+
+Java previously provided a `finalize()` method, intended to be called by the Garbage Collector just before an object was destroyed — meant to behave like a destructor.
+
+```java
+class Demo {
+    protected void finalize() {
+        System.out.println("Object is being garbage collected");
+    }
+}
+```
+
+### Problems with `finalize()`
+
+- **Unpredictable timing** — no guarantee when (or even if) it will run before the program ends.
+- **Performance overhead** — objects with `finalize()` are slower to garbage collect.
+- **Unreliable** — GC may never run if the program exits first.
+- **Deprecated since Java 9**, marked for removal in future versions.
+
+**Conclusion:** `finalize()` should not be used in real code. Mention it only as historical context.
+
+------
+
+## 12.5. The Correct Modern Approach: `AutoCloseable` + `try-with-resources`
+
+For releasing resources (files, DB connections, sockets), Java's proper mechanism is the `AutoCloseable` interface combined with `try-with-resources`.
+
+```java
+class FileHandler implements AutoCloseable {
+    FileHandler() {
+        System.out.println("Resource opened");
+    }
+
+    void process() {
+        System.out.println("Processing file");
+    }
+
+    @Override
+    public void close() {
+        System.out.println("Resource closed");
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        try (FileHandler fh = new FileHandler()) {
+            fh.process();
+        }
+        // close() is called automatically here, even if an exception occurs
+    }
+}
+```
+
+**Output:**
+
+```
+Resource opened
+Processing file
+Resource closed
+```
+
+### Why this is better than `finalize()`
+
+- `close()` is called **deterministically**, right when the `try` block ends.
+- Works even if an exception is thrown inside the block.
+- No dependency on GC timing.
+
+------
+
+## 12.6. Summary
+
+- Java has **no destructors** — memory cleanup is handled by the Garbage Collector.
+- `finalize()` was Java's old attempt at destructor-like behavior — **deprecated, avoid using**.
+- For resource cleanup (files, connections, etc.), use **`AutoCloseable` + `try-with-resources`** — this is the modern, correct, and reliable pattern.

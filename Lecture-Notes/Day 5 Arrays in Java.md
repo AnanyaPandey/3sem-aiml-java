@@ -169,6 +169,212 @@ for (int i = 0; i < 2; i++) {
 
 
 
+### Declaring and creating a String array
+
+java
+
+```java
+// Method 1: declare then create
+String[] names;
+names = new String[3];  // size 3, all elements null initially
+
+// Method 2: declare and create together
+String[] names = new String[3];
+
+// Method 3: declare and initialize with values
+String[] names = {"Amit", "Priya", "Rahul"};
+
+// Method 4: using new with values
+String[] names = new String[]{"Amit", "Priya", "Rahul"};
+```
+
+### Accessing elements
+
+java
+
+```java
+String[] names = {"Amit", "Priya", "Rahul"};
+
+System.out.println(names[0]);  // Amit
+System.out.println(names[1]);  // Priya
+System.out.println(names.length);  // 3 (no parentheses — it's a field, not a method)
+```
+
+### Assigning / updating values
+
+java
+
+```java
+names[0] = "Suresh";  // replaces "Amit" with "Suresh"
+```
+
+### Looping through a String array
+
+**Normal for loop (use when you need the index):**
+
+java
+
+```java
+for (int i = 0; i < names.length; i++) {
+    System.out.println(i + ": " + names[i]);
+}
+```
+
+**Enhanced for loop (use when you just need values):**
+
+java
+
+```java
+for (String name : names) {
+    System.out.println(name);
+}
+```
+
+### Common operations
+
+**Sorting:**
+
+java
+
+```java
+import java.util.Arrays;
+
+String[] names = {"Rahul", "Amit", "Priya"};
+Arrays.sort(names);  // sorts alphabetically
+System.out.println(Arrays.toString(names));  // [Amit, Priya, Rahul]
+```
+
+**Printing the whole array:**
+
+java
+
+```java
+System.out.println(names);               // wrong — prints memory address like [Ljava.lang.String;@1b6d3586
+System.out.println(Arrays.toString(names)); // correct — prints [Amit, Priya, Rahul]
+```
+
+**Searching:**
+
+java
+
+```java
+String[] names = {"Amit", "Priya", "Rahul"};
+boolean found = Arrays.asList(names).contains("Priya");  // true
+```
+
+**Copying:**
+
+java
+
+```java
+String[] copy = Arrays.copyOf(names, names.length);
+```
+
+**Comparing two arrays:**
+
+java
+
+```java
+String[] a = {"x", "y"};
+String[] b = {"x", "y"};
+
+System.out.println(a == b);              // false — compares references
+System.out.println(a.equals(b));         // false — same reason
+System.out.println(Arrays.equals(a, b)); // true — compares actual contents
+```
+
+### 2D String arrays (array of arrays)
+
+java
+
+```java
+String[][] grid = {
+    {"a", "b"},
+    {"c", "d"}
+};
+System.out.println(grid[1][0]);  // c
+```
+
+### Key things to remember
+
+- Arrays have **fixed size** once created — you can't add or remove elements, only change existing ones
+- If you need a resizable list of strings, use `ArrayList<String>` instead
+  - `names.length` — no `()`, unlike `String.length()` which is a method on a single string
+
+### Java Enhanced For Loop
+
+**Syntax:**
+
+java
+
+```java
+for (Type variable : collection) {
+    // use variable
+}
+```
+
+**What the `:` means**
+
+Read it as "in" or "for each element in". So `for (int a : b)` means "for each int a, in b".
+
+It's not an operator like `+` or `-`. It's just special syntax the Java compiler recognizes for this specific loop form. You cannot use `:` this way anywhere else in Java.
+
+**Where it can be used**
+
+`b` (the thing after `:`) must be one of:
+
+1. An **array** — e.g. `int[] b = {1,2,3};`
+2. Anything that implements `Iterable` — e.g. `ArrayList`, `HashSet`, `LinkedList`, and most classes in `java.util`
+
+**Example with array:**
+
+java
+
+```java
+int[] numbers = {10, 20, 30};
+for (int n : numbers) {
+    System.out.println(n);
+}
+```
+
+**Example with collection:**
+
+java
+
+```java
+List<String> names = new ArrayList<>();
+names.add("Amit");
+names.add("Priya");
+
+for (String name : names) {
+    System.out.println(name);
+}
+```
+
+**Why use it**
+
+- Shorter, cleaner code than a normal `for` loop
+- No need to manage an index variable or worry about `ArrayIndexOutOfBoundsException`
+- Good when you just want to read/use each element, not track its index
+
+**When NOT to use it**
+
+- If you need the index (e.g. `arr[i]`)
+- If you need to modify the array/list while looping
+- If you're looping backwards or skipping elements
+
+**Plain `for` loop for comparison:**
+
+java
+
+```java
+for (int i = 0; i < numbers.length; i++) {
+    System.out.println(numbers[i]);
+}
+```
+
+Both loops above do the same thing — the for-each version is just simpler when you don't need the index `i`.
+
 ## Summary
 
 - Arrays store multiple values of the same type under one name.

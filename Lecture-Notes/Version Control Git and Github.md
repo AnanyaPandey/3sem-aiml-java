@@ -100,3 +100,4 @@ These commands synchronize your local repository with a remote server (like GitH
 - **`git reset [commit_hash]`** Moves your branch pointer backward to a previous commit.
 - **`git revert [commit_hash]`** Creates a *new* commit that undoes the changes made in a specific past commit (the safest way to undo shared history).
 
+​		

@@ -242,6 +242,50 @@ class Student {
 
 **Which constructor you call decides which values you're responsible for providing — everything else in that path is whatever the constructor code says, including any defaults hardcoded via `this(...)`.**
 
+### RECTANGLE EXAMPLE
+
+```java
+public class Rectangle {
+
+    double length;
+    double width;
+
+    // Overload 1: no arguments — default square-ish shape
+    public Rectangle() {
+        length = 1.0;
+        width = 1.0;
+    }
+
+    // Overload 2: one argument — square (equal sides)
+    public Rectangle(double side) {
+        length = side;
+        width = side;
+    }
+
+    // Overload 3: two arguments — full rectangle
+    public Rectangle(double length, double width) {
+        this.length = length;
+        this.width = width;
+    }
+
+    public double area() {
+        return length * width;
+    }
+
+    public static void main(String[] args) {
+        Rectangle r1 = new Rectangle();
+        Rectangle r2 = new Rectangle(5.0);
+        Rectangle r3 = new Rectangle(4.0, 6.0);
+
+        System.out.println("r1 area: " + r1.area()); // 1.0
+        System.out.println("r2 area: " + r2.area()); // 25.0
+        System.out.println("r3 area: " + r3.area()); // 24.0
+    }
+}
+```
+
+
+
 ------
 
 ## 8. Summary Table
@@ -332,6 +376,101 @@ public class Main {
     }
 }
 ```
+
+### THIS() and THIS REFERENCE
+
+```java
+public class Box {
+
+    int side;
+
+    // Constructor 2 written FIRST now
+    public Box(int side) {
+        this.side = side;
+        System.out.println("Constructor 2 (one-arg) called");
+    }
+
+    // Constructor 1 written SECOND
+    public Box() {
+        this(10);
+        System.out.println("Constructor 1 (no-arg) called");
+    }
+
+    public static void main(String[] args) {
+        Box box1 = new Box();
+        System.out.println("box1 side = " + box1.side);
+
+        Box box2 = new Box(25);
+        System.out.println("box2 side = " + box2.side);
+    }
+}
+```
+
+
+
+```java
+public class StudentCC {
+    // Instance variables
+    String name;
+    int age;
+    String course;
+
+    // Constructor 1: only name
+    public StudentCC(String name) {
+        // "this()" - calls Constructor 2 (name, age), not Constructor 3 directly
+        this(name, 18);
+        System.out.println("Constructor 1 called");
+    }
+
+    // Constructor 2: name and age
+    public StudentCC(String name, int age) {
+        // "this()" - calls Constructor 3, passing a default course
+        this(name, age, "Not Assigned");
+        System.out.println("Constructor 2 called");
+    }
+
+    // Constructor 3: name, age, and course (full constructor)
+    public StudentCC(String name, int age, String course) {
+        // "this." - refers to the current object's fields
+        // Needed here because parameter names are same as field names
+        this.name = name;
+        this.age = age;
+        this.course = course;
+        System.out.println("Constructor 3 called");
+    }
+
+    // Method using "this" to return the current object
+    public StudentCC updateCourse(String course) {
+        this.course = course;   // "this." resolves naming conflict
+        return this;            // "this" returns the current object (method chaining)
+    }
+
+    public void display() {
+        System.out.println("Name: " + this.name + ", Age: " + this.age + ", Course: " + this.course);
+    }
+
+    public static void main(String[] args) {
+        System.out.println("--- Creating student1 with only name ---");
+        StudentCC student1 = new StudentCC("Ananya");
+        student1.display();
+
+        System.out.println("\n--- Creating student2 with name and age ---");
+        StudentCC student2 = new StudentCC("Rahul", 20);
+        student2.display();
+
+        System.out.println("\n--- Creating student3 with name, age, course ---");
+        StudentCC student3 = new StudentCC("Priya", 19, "AI & ML");
+        student3.display();
+
+        System.out.println("\n--- Using method chaining with 'this' ---");
+        student1.updateCourse("Data Science").display();
+    }
+}
+```
+
+
+
+
 
 ## 12. Destructors 
 

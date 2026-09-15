@@ -168,6 +168,61 @@ public class Main {
 
 **Analogy:** think of a "draw shape" command. If you say "draw" to a circle, it draws a circle. If you say "draw" to a square, it draws a square. Same command, different result — because the object itself decides how to respond.
 
+### Polymorphism Has TWO Main Types in Java
+
+You already learned both of these individually — you just hadn't seen them grouped under the single word "polymorphism" together yet.
+
+#### Type 1: Compile-time Polymorphism — this IS Method Overloading
+
+java
+
+```java
+class Calculator {
+    int add(int a, int b) { return a + b; }
+    double add(double a, double b) { return a + b; }
+}
+```
+
+This is polymorphism too — the same method name `add` behaves differently depending on what you pass in. It's called "compile-time" because Java decides **which version to run** while compiling, just by looking at the types you passed.
+
+#### Type 2: Runtime Polymorphism — this IS Method Overriding
+
+java
+
+```java
+class Animal {
+    void makeSound() { System.out.println("Generic sound"); }
+}
+
+class Dog extends Animal {
+    @Override
+    void makeSound() { System.out.println("Woof"); }
+}
+```
+
+java
+
+```java
+Animal a = new Dog();
+a.makeSound();   // Woof - decided at RUNTIME, based on the actual object
+```
+
+This is called "runtime" because Java decides **which version to run** while the program is actually executing, based on the real object type — not just by looking at the code.
+
+### So Why Do People Often Say "Polymorphism = Overriding" (like you just did)?
+
+Because **runtime polymorphism (overriding) is the more powerful, more talked-about, more "interesting" form** — it's the one that lets you write flexible code like your `Zookeeper.interact(Animal a)` example, where one method handles many different object types automatically. Overloading feels more like a minor convenience (same name, avoid typing different names), so a lot of teaching material and casual conversation focuses only on overriding when they say "polymorphism," even though that's technically incomplete.
+
+### Side-by-Side Comparison
+
+|                       | Compile-time Polymorphism (Overloading)  | Runtime Polymorphism (Overriding)           |
+| --------------------- | ---------------------------------------- | ------------------------------------------- |
+| Same method name?     | Yes                                      | Yes                                         |
+| Parameters            | Must be DIFFERENT                        | Must be EXACTLY the same                    |
+| Requires inheritance? | No                                       | Yes                                         |
+| Decided when?         | Compile time (before running)            | Runtime (while running)                     |
+| Example               | `add(int, int)` vs `add(double, double)` | `Dog`'s `makeSound()` overriding `Animal`'s |
+
 ------
 
 ## 6. Abstraction — "Show Essentials, Hide Complexity"

@@ -114,12 +114,19 @@ class BikeFactory {
         b.color = "Red";
         return b;             // hand the address slip back out
     }
+    
+     static Bike BikePainter(Bike b, String Col) {
+        b.color = Col;
+        return b;             // hand the address slip back out
+    }
 }
 
 class Test {
     public static void main(String[] args) {
         Bike myBike = BikeFactory.createRedBike();
         System.out.println(myBike.color);   // Red
+        BikeFactory.BikePainter(myBike,"Green");
+        System.out.println(myBike.color); // Green 
     }
 }
 ```

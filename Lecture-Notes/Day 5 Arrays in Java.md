@@ -426,5 +426,3 @@ Both loops above do the same thing — the for-each version is just simpler when
 
 22. Store marks of 5 students in an array, and print each student's grade based on marks (using if-else with array traversal).
 23. Build a simple "array-based to-do list" — store tasks as strings in an array and let the user add/view them (introduces array of `String`, ties into loops).
-
-Want me to turn a subset of these into a markdown practice sheet (with just the questions, no solutions) for students, or one with solutions for your own reference?

@@ -23,8 +23,8 @@ public class fractions {
     }
 
     int hcf() {
-        int P = this.p;
-        int Q = this.q;
+        int P = Math.abs(this.p);
+        int Q = Math.abs(this.q);
         int min,h=1;
         if(P<=Q) 
             min=P;
@@ -50,12 +50,21 @@ public class fractions {
         return new fractions(P,Q).SIMPLIFY(); 
     }
 
+        public fractions SubF(fractions other) {
+        int P = (this.p*other.q - this.q*other.p);
+        int Q = this.q*other.q;
+        return new fractions(P,Q).SIMPLIFY(); 
+    }
+
     public static void main (String[] args) {
         fractions f1 = new fractions(5,20);
         fractions f2 = new fractions(3,10);
         fractions f3 = f1.SIMPLIFY().AddF(f2.SIMPLIFY());
-        //System.out.println();
+        System.out.println();
         f3.show();
+        System.out.println();
+        fractions f4 = f1.SIMPLIFY().SubF(f2.SIMPLIFY());
+        f4.show();
     }
 
 

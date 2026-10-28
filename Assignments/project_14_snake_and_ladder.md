@@ -26,78 +26,106 @@
 
 ------
 
-## PROJECT 14: SNAKE AND LADDER GAME
+# PROJECT 14: SNAKE AND LADDER GAME
 
-### What you will make
+## What you will make
 
-A text-based board game. Players roll dice to move from 0 to exactly 100. Arrays will act as the board's "rules" for snakes and ladders.
+A text board game for 2 players: one human and one bot. Players start at 0 and must reach exactly 100. Arrays store the snakes and ladders. The game also has a "test mode", where you can choose the dice number, so that you can show every rule in the demo.
 
-### Starting data
+## Starting data
 
-1. 2 Players (1 Human, 1 Bot).
-2. Hardcode 2 ladders and 2 snakes using arrays.
+1. 2 players: a Human and a Bot.
+2. 2 snakes: head at 99 goes to 10, head at 45 goes to 5.
+3. 2 ladders: bottom at 15 goes to 35, bottom at 60 goes to 85.
 
-### Rules
+## Rules
 
-1. A player must roll the exact number to land on 100. If they are at 98 and roll a 5, they cannot move.
+1. A player must land exactly on 100. If position + roll is more than 100, the player does not move.
+2. If a player lands on a snake head, the player goes down to the snake tail.
+3. If a player lands on a ladder bottom, the player goes up to the ladder top.
+4. When a player reaches 100, the game is won, and no more turns are allowed.
+5. In test mode, before each roll the program asks for the dice number (1 to 6, or 0 for a random roll). At the start of the game, it also asks for the start position of each player.
 
-### PERSON 1: Dice and Exceptions
+## PERSON 1: Dice and the exceptions
 
-**What this class is for:** Generating random rolls and handling game errors.
+**What this class is for:** To give the dice number, random or chosen.
+
 **Steps:**
 
-1. Private variable: `int sides = 6;`
-2. Write `int roll()`: use `Math.random()`. Multiply by sides, cast to int, add 1. Return a number from 1 to 6.
-3. **Make 2 custom exceptions:**
-   * `InvalidMoveException`: "Roll is too high, you must land on exactly 100."
-   * `GameOverException`: "The game has already been won!"
+1. Private variables: `sides` (6) and `nextRoll` (starts at 0).
+2. `setNextRoll(int n)`: save `n` (for test mode).
+3. `roll()`: if `nextRoll` is more than 0, return it and set `nextRoll` back to 0. Otherwise use `Math.random()` to return a number from 1 to `sides`.
+4. Make 2 custom exceptions:
+   - `InvalidMoveException`: message "Roll is too high, you must land on exactly 100".
+   - `GameOverException`: message "The game has already been won".
 
-### PERSON 2: Player classes
+**How to test your part:** Call `roll()` 20 times and check that all numbers are from 1 to 6. Use `setNextRoll(4)` and check that the next roll is 4 and the one after is random.
 
-**What this class is for:** Different types of players.
+## PERSON 2: Player, HumanPlayer and BotPlayer
+
+**What this class is for:** Both players move in the same way, but they wait for the roll in different ways.
+
 **Steps:**
 
-1. Make an `abstract class Player`.
-2. Private variables: `name` (String), `position` (int, starts at 0).
-3. Abstract method: `public abstract void takeTurnMsg();`
-4. Make child `HumanPlayer`:
-   * `takeTurnMsg()` prints: "Press Enter to roll the dice..." (use Scanner to wait for input).
-5. Make child `BotPlayer`:
-   * `takeTurnMsg()` prints: "Bot is rolling the dice automatically..."
+1. Make an abstract class `Player`.
+2. Private variables: `name`, `position` (starts at 0).
+3. Constructor takes the name. Make `getName()` and `getPosition()`.
+4. `moveTo(int newPosition)`: sets the position directly (used for snakes, ladders and test mode).
+5. `move(int roll)`: if `position + roll` is more than 100, throw `InvalidMoveException`. Otherwise add the roll to the position.
+6. Abstract method: `waitForRoll()`.
+7. `HumanPlayer`: the constructor also takes the shared `Scanner`. `waitForRoll()` prints "Press Enter to roll the dice..." and waits for the user to press Enter.
+8. `BotPlayer`: `waitForRoll()` prints "Bot is rolling the dice automatically..." and does not wait.
 
-### PERSON 3: Board class
+**How to test your part:** Move a player to 98 and call `move(5)`. The exception must come, and the position must stay 98.
 
-**What this class is for:** Holding the hazard arrays.
+## PERSON 3: Board
+
+**What this class is for:** To keep the snakes and ladders.
+
 **Steps:**
 
-1. Private arrays:
-   * `int[] snakeHeads = {99, 45};` and `int[] snakeTails = {10, 5};`
-   * `int[] ladderBottoms = {15, 60};` and `int[] ladderTops = {35, 85};`
-2. Write `checkSquare(int playerPos)`:
-   * Loop through `snakeHeads`. If `playerPos == snakeHeads[i]`, print "OH NO! Bitten by snake!", return `snakeTails[i]`.
-   * Loop through `ladderBottoms`. If `playerPos == ladderBottoms[i]`, print "YAY! Climbed a ladder!", return `ladderTops[i]`.
-   * Else, return `playerPos` (no change).
+1. Private arrays: `snakeHeads`, `snakeTails`, `ladderBottoms`, `ladderTops` (use the starting data).
+2. `checkSquare(int position)`:
+   - Loop through `snakeHeads`. If the position matches, print "OH NO! Bitten by a snake!" and return the matching tail.
+   - Loop through `ladderBottoms`. If the position matches, print "YAY! Climbed a ladder!" and return the matching top.
+   - Otherwise return the same position.
+3. `showRules()`: print every snake (head to tail) and every ladder (bottom to top).
+4. `isValid()`: returns true only if every snake head is higher than its tail, every ladder top is higher than its bottom, and both pairs of arrays have the same length.
 
-### PERSON 4: Main Game Engine
+**How to test your part:** Call `checkSquare` with 99, 15, and 50. Check the three answers (10, 35, 50).
 
-**What this class is for:** Alternating turns.
+## PERSON 4: Game and Main
+
+**What this class is for:** To run the turns and connect everything.
+
 **Steps:**
 
-1. Create an array of `Player[] players = new Player[2];` (Put human at index 0, bot at index 1).
-2. Make a `while(true)` loop:
-   * For each player in the array:
-   * Call `player.takeTurnMsg()`.
-   * Call `dice.roll()`.
-   * Calculate `newPos = player.getPosition() + roll`.
-   * If `newPos > 100`, **throw** an `InvalidMoveException`. Catch it, print the warning, and their turn is over without moving.
-   * If `newPos <= 100`, pass `newPos` into `board.checkSquare(newPos)`.
-   * Update the player's position to whatever the board returns.
-   * Print "Player is now at space X".
-   * If position == 100, print "WINNER!", and break the loop.
+1. `Game` private variables: `Player[] players` (human at 0, bot at 1), `Dice dice`, `Board board`, `gameOver` (false), `testMode`, and the shared `Scanner`.
+2. `playTurn(Player p)`:
+   - If `gameOver` is true, throw `GameOverException`.
+   - Call `p.waitForRoll()`.
+   - If `testMode` is true, ask "Type dice number (1-6), or 0 for random" and call `dice.setNextRoll(...)`.
+   - Call `dice.roll()` and print the number.
+   - Try `p.move(roll)`. If `InvalidMoveException` comes, print the message, and the turn ends.
+   - Otherwise call `board.checkSquare(...)` and `p.moveTo(...)` with the answer. Print "Name is now at square X".
+   - If the position is 100, print "WINNER!" and set `gameOver` to true.
+3. `play()`: loop forever through the players and call `playTurn`. When `GameOverException` comes, print the message and stop the loop.
+4. In test mode, `play()` first asks the start position of each player and calls `moveTo`.
+5. Main class: menu in a loop. Use ONE Scanner.
 
-### DEMO: Your group must show these test cases
+**Menu:**
 
-1. Land on a ladder bottom and show the position update to the top.
-2. Land on a snake head and show the position update to the bottom.
-3. Show Polymorphism: the Human waits for an Enter keypress, but the Bot rolls instantly.
-4. Have a player reach square 98, then roll a 5. Show the `InvalidMoveException` catching it.
+```
+1. Play a game
+2. Play a game in test mode
+3. Show snakes and ladders
+4. Stop program
+```
+
+## DEMO: your group must show all 5
+
+1. Test mode: start at 10, roll 5. The player must climb the ladder from 15 to 35.
+2. Test mode: start at 40, roll 5. The player must go down the snake from 45 to 5.
+3. Show polymorphism: the Human waits for Enter, the Bot rolls at once.
+4. Test mode: start at 98 and roll 5. The "must land exactly on 100" message must show, and the position stays 98. Then roll 2. The player wins, and the "game already won" message must show after that.
+5. Play one normal game with random dice until someone wins.

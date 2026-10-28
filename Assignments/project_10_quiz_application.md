@@ -26,78 +26,103 @@
 
 ------
 
-## PROJECT 10: QUIZ APPLICATION
+# PROJECT 10: QUIZ APPLICATION
 
-### What you will make
+## What you will make
 
-A digital quiz test engine. It supports multiple-choice questions (A/B/C/D) and True/False questions. It keeps track of player scores.
+A quiz program with multiple choice questions (A, B, C, D) and True/False questions. Every correct answer gives marks. The program keeps the scores of players.
 
-### Starting data
+## Starting data
 
-1. Hardcode 3 Multiple Choice Questions and 2 True/False Questions in an array.
+1. 3 multiple choice questions and 2 True/False questions about Java.
+2. Each question gives 10 points.
 
-### Rules
+## Rules
 
-1. Players get 10 points for each correct answer.
-2. If a player types "E" for a question that only has A, B, C, D, the system should catch the error and ask again.
+1. A multiple choice answer must be A, B, C or D (small or capital letter).
+2. A True/False answer must be True or False (any letter case).
+3. If the answer is not valid, the program shows a message and asks the SAME question again. No points are lost.
+4. The scoreboard keeps the last 10 players.
 
-### PERSON 1: Question classes
+## PERSON 1: Question, MCQQuestion and TrueFalseQuestion
 
-**What this class is for:** Storing different question formats using Polymorphism.
+**What this class is for:** Two types of questions, with their own way to check answers.
+
 **Steps:**
 
-1. Make an `abstract class Question`.
-2. Private variables: `questionText` (String), `points` (int, default to 10).
-3. Abstract method: `public abstract boolean checkAnswer(String userAnswer);`
-4. Abstract method: `public abstract void displayQuestion();`
-5. Make child `MCQQuestion`:
-   * Variables: `String[] options` (size 4, for A, B, C, D text) and `String correctAnswer` (e.g., "B").
-   * `displayQuestion()` prints the question text, then loops through the 4 options and prints them.
-   * `checkAnswer(String ans)` compares `ans.toUpperCase()` to `correctAnswer`. Returns true if match, false if not.
-6. Make child `TrueFalseQuestion`:
-   * Variables: `boolean correctAnswer`.
-   * `displayQuestion()` prints the question text and says "(Type True or False)".
-   * `checkAnswer(String ans)` parses the user's string to a boolean and checks if it matches.
+1. Make an abstract class `Question`.
+2. Private variables: `questionText`, `points`.
+3. Constructor takes questionText and points. Make getters.
+4. Abstract methods: `displayQuestion()`, `isValidAnswer(String ans)` and `checkAnswer(String ans)`.
+5. Child `MCQQuestion`: extra variables `String[] options` (size 4) and `correctAnswer` ("A" to "D").
+   - `displayQuestion()`: print the question and the 4 options with A, B, C, D.
+   - `isValidAnswer()`: true only for A, B, C, D (any letter case).
+   - `checkAnswer()`: true if the answer equals `correctAnswer` (ignore letter case).
+6. Child `TrueFalseQuestion`: extra variable `boolean correctAnswer`.
+   - `displayQuestion()`: print the question and "(Type True or False)".
+   - `isValidAnswer()`: true only for "true" or "false" (ignore letter case).
+   - `checkAnswer()`: compare the answer with `correctAnswer`.
 
-### PERSON 2: Quiz Manager and Exceptions
+**How to test your part:** Make one of each. Test `isValidAnswer("Hello")` (false) and `checkAnswer(...)` with a right and a wrong answer.
 
-**What this class is for:** Holding the test paper.
+## PERSON 2: Quiz and the exceptions
+
+**What this class is for:** To hold the questions and to check an answer for the program.
+
 **Steps:**
 
-1. Private variables: `Question[] quizQuestions` (size 5), `int count`.
-2. Write `addQuestion(Question q)`: adds to the array. If the array is full, **throw** a `QuizFullException`.
-3. Write `getQuestion(int index)`: returns the question at that spot.
-4. **Make 2 custom exceptions:** `QuizFullException` and `InvalidOptionException` (You will throw `InvalidOptionException` if a user types something weird like "Z").
+1. Private variables: `Question[] questions` (size 5), `count`.
+2. `addQuestion(Question q)`: if the array is full, throw `QuizFullException`. Otherwise store it.
+3. `getQuestion(int index)`, `getQuestionCount()`, `getTotalPoints()` (sum of all points).
+4. `submitAnswer(int index, String ans, Player p)`:
+   - If `!question.isValidAnswer(ans)`, throw `InvalidOptionException`.
+   - If `question.checkAnswer(ans)`: call `p.addPoints(question.getPoints())` and return true.
+   - Otherwise return false.
+5. Make 2 custom exceptions:
+   - `QuizFullException`: message "The quiz already has 5 questions".
+   - `InvalidOptionException`: message "This is not a valid answer for this question".
 
-### PERSON 3: Player and ScoreBoard
+**How to test your part:** Add 6 questions. The 6th must give the exception. Call `submitAnswer` with "Z". The other exception must come.
 
-**What this class is for:** Tracking who took the test and what they scored.
+## PERSON 3: Player and ScoreBoard
+
+**What these classes are for:** To remember who took the quiz and what they scored.
+
 **Steps:**
 
-1. Player variables: `playerName` (String), `totalScore` (int).
-2. Write `addPoints(int p)` inside Player.
-3. ScoreBoard variables: `Player[] history` (size 10), `int playerCount`.
-4. Write `saveScore(Player p)`: adds player to the history array.
-5. Write `showAllScores()`: loops through the history array and prints "Name: Score".
+1. `Player`: private variables `playerName`, `totalScore`. Constructor takes the name. Make getters. Write `addPoints(int p)`.
+2. `Player.toString()`: example `Ravi : 30`.
+3. `ScoreBoard`: private variables `Player[] history` (size 10), `playerCount`.
+4. `saveScore(Player p)`: store it. If the array is full, print "Scoreboard is full".
+5. `showAllScores()`: print every player and score. If empty, print "No scores yet".
+6. `showTopScorer()`: find and print the player with the highest score.
 
-### PERSON 4: Main Engine
+**How to test your part:** Save 3 players with different scores. Check `showTopScorer()`.
 
-**What this class is for:** Running the actual test.
+## PERSON 4: Main
+
+**What this class is for:** To run the quiz.
+
 **Steps:**
 
-1. In `main`, create the 5 questions and add them to the Quiz Manager.
-2. Create the menu: 1. Take Quiz, 2. View History.
-3. If they choose "Take Quiz":
-   * Ask for their name, create a `Player` object.
-   * Use a `for` loop from 0 to 4 to get each question.
-   * Call `question.displayQuestion()`.
-   * Use `Scanner` to get their answer.
-   * **Validation:** If the question is an MCQ, and they typed "X" or "123", **throw** your `InvalidOptionException`, catch it, print "Please type A, B, C, or D", and make them answer the *same* question again (decrease your loop counter `i--` so it repeats).
-   * Call `question.checkAnswer()`. If true, print "Correct!" and add points to the player. If false, print "Wrong!".
-   * After the loop, call `scoreboard.saveScore(player)`.
+1. Create ONE `Scanner`, one `Quiz` and one `ScoreBoard`.
+2. Create the 5 questions and add them with `addQuestion` inside `try/catch`.
+3. "Take quiz": ask the name, make a `Player`, and loop through the questions using `quiz.getQuestionCount()` (do not write the number 5 in your loop).
+4. For each question: display it, read the answer, and call `quiz.submitAnswer(...)`. If `InvalidOptionException` comes, print the message and ask the same question again (use a `while` loop for each question). Print "Correct!" or "Wrong!".
+5. At the end print the score (for example "30 out of 50") and save the player in the ScoreBoard.
 
-### DEMO: Your group must show these test cases
+**Menu:**
 
-1. Take the quiz and get a mix of right and wrong answers. Show the final score.
-2. When asked an MCQ question, type "Hello". Show the `InvalidOptionException` catching it and asking the user to try again.
-3. Take the quiz with two different names, then view the Scoreboard history to prove both were saved in the array.
+```
+1. Take quiz
+2. View all scores
+3. Show top scorer
+4. Stop program
+```
+
+## DEMO: your group must show all 4
+
+1. Take the quiz with some right and some wrong answers. Show the final score.
+2. For an MCQ type "Hello", and for a True/False type "Maybe". The message must show and the same question must come again.
+3. Take the quiz with two names. Show both in the scoreboard and show the top scorer.
+4. Explain how `isValidAnswer` and `checkAnswer` work differently in the two question types (polymorphism).

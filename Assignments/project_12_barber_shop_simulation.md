@@ -26,79 +26,117 @@
 
 ------
 
-## PROJECT 12: BARBER SHOP SIMULATION (MONTE CARLO)
+# PROJECT 12: BARBER SHOP SIMULATION (MONTE CARLO)
 
-### What you will make
+## What you will make
 
-A time-based simulation (running in "ticks" or minutes). Customers arrive, sit in a waiting array, and barbers pull them from the array to cut their hair. Since Queue classes are banned, you will build a manual array queue.
+A barber shop with 2 barbers (one junior, one senior) and 3 waiting chairs. Time moves in "ticks" (1 tick = 1 minute). One day has 20 ticks. You can run the shop by hand (you decide who arrives and when). You can also let the computer run 100 random days and show the average result. This second part is the Monte Carlo part.
 
-### Starting data
+## Starting data
 
-1. 1 Junior Barber, 1 Senior Barber.
-2. A waiting area with 3 chairs (Array of size 3).
+1. 1 Junior barber and 1 Senior barber (keep the Senior barber first in the array).
+2. A waiting area with 3 chairs (an array of size 3).
 
-### Rules
+## Rules of the shop
 
-1. A Junior Barber needs 3 "ticks" (minutes) to finish a haircut.
-2. A Senior Barber needs 1 "tick" to finish a haircut.
-3. If all 3 chairs are full when a customer arrives, they immediately leave angry.
+1. A Junior barber needs 3 ticks for one haircut. A Senior barber needs 1 tick.
+2. If a customer arrives and all 3 chairs are full, the customer leaves angry. Count this as a lost customer.
+3. The shop closes when the clock shows 20. After that, no new customer can enter.
+4. Barbers take a customer from the chairs only when the clock moves.
+5. Every time the clock moves by one tick, do these steps in this exact order:
+   - Add 1 to the tick.
+   - Every barber who is busy works one tick.
+   - Every barber who is free takes the next customer from the chairs (if there is one).
+6. In automatic mode, at every tick a customer arrives with a 40% chance (`Math.random() < 0.4`).
+7. Classes do not print messages inside `walkIn` and `workOneTick`. They return a result, and the Simulation prints. (This lets automatic mode run silently.)
 
-### PERSON 1: Customer and Exceptions
+## PERSON 1: Customer and the exceptions
 
-**What this class is for:** Represents the person arriving.
+**What this class is for:** One object of this class is ONE customer.
+
 **Steps:**
 
-1. Private variables: `customerId` (int), `name` (String).
-2. Constructor and getters.
-3. **Make 2 custom exceptions:**
-   * `QueueFullException`: "No chairs available, customer leaves."
-   * `ShopClosedException`: "The time is up, the shop is locked."
+1. Private variables: `customerId`, `name`, `arrivalTick`.
+2. The `customerId` is automatic: use a static counter (1, 2, 3...). The name is "Customer " plus the ID.
+3. Constructor takes the arrival tick. Make getters.
+4. `toString()`: example `Customer 3 (arrived at tick 5)`.
+5. Make 2 custom exceptions:
+   - `QueueFullException`: message "No chair is free, customer leaves angry".
+   - `ShopClosedException`: message "The shop is closed for today".
 
-### PERSON 2: Barber classes
+**How to test your part:** Make 3 customers. Check that the IDs are 1, 2, 3.
 
-**What this class is for:** The workers who process the customers.
+## PERSON 2: Barber, JuniorBarber and SeniorBarber
+
+**What this class is for:** The workers who cut hair. A senior barber is faster.
+
 **Steps:**
 
-1. Make an `abstract class Barber`.
-2. Private variables: `name` (String), `int remainingWorkTime` (default 0), `Customer currentCustomer` (default null).
-3. Abstract method: `public abstract int getSpeed();`
-4. Make `JuniorBarber`: `getSpeed()` returns 3.
-5. Make `SeniorBarber`: `getSpeed()` returns 1.
-6. Write `isFree()`: returns true if `remainingWorkTime == 0`.
-7. Write `startCut(Customer c)`: set `currentCustomer = c`. Set `remainingWorkTime = getSpeed()`.
-8. Write `workOneTick()`: if `remainingWorkTime > 0`, reduce it by 1. If it hits 0, print "Barber finished with " + customer.name.
+1. Make an abstract class `Barber`.
+2. Private variables: `name`, `remainingWorkTime` (starts at 0), `currentCustomer` (starts as null), `customersServed` (starts at 0).
+3. Constructor takes the name. Make getters.
+4. Abstract method: `getHaircutTime()`.
+5. `JuniorBarber`: returns 3. `SeniorBarber`: returns 1.
+6. `isFree()`: true if `remainingWorkTime` is 0.
+7. `startCut(Customer c)`: save the customer, and set `remainingWorkTime` to `getHaircutTime()`.
+8. `workOneTick()`: if `remainingWorkTime` is more than 0, subtract 1. If it is now 0, set `currentCustomer` to null, add 1 to `customersServed`, and return true (haircut finished). In all other cases return false.
+9. `toString()`: shows name, type, and "Free" or "Busy with Customer X (N ticks left)".
 
-### PERSON 3: Shop Waiting Area (The Manual Queue)
+**How to test your part:** Start a cut on a junior barber. Call `workOneTick()` 3 times. Only the 3rd call must return true.
 
-**What this class is for:** Managing the chairs using an array.
+## PERSON 3: Shop and Statistics
+
+**What these classes are for:** The Shop is the waiting area. The Statistics keeps the numbers.
+
+**Shop steps:**
+
+1. Private variables: `Customer[] chairs = new Customer[3]`, `count`.
+2. `walkIn(Customer c, int tick)`:
+   - If `tick` is 20 or more, throw `ShopClosedException`.
+   - If `count` equals the number of chairs, throw `QueueFullException`.
+   - Otherwise put the customer in `chairs[count]` and add 1 to `count`.
+3. `getNextCustomer()`:
+   - If `count` is 0, return null.
+   - Save `chairs[0]`. Then use a loop to move every customer one place to the left (this must work for any number of chairs, not only 3). Set the last used chair to null. Subtract 1 from `count`. Return the saved customer.
+4. `getCount()` and `showChairs()` (print each chair as "Chair 1: Customer 4" or "Chair 2: Empty").
+
+**Statistics steps:**
+
+1. Private variables: `served`, `lost`, `daysRun`.
+2. `recordServed()`, `recordLost()`, `endDay()` (adds 1 to `daysRun`).
+3. `printTotals()`: prints served and lost.
+4. `printAverages()`: prints average served and average lost per day. (If `daysRun` is 0, print a message. Do not divide by zero.)
+
+**How to test your part:** Put 3 customers in the chairs. Try a 4th (exception). Take one out and check the others moved left.
+
+## PERSON 4: Simulation and Main
+
+**What this class is for:** To run the clock and connect everything.
+
 **Steps:**
 
-1. Private variables: `Customer[] chairs = new Customer[3];`, `int count = 0;`
-2. Write `walkIn(Customer c)`:
-   * If `count == 3`, **throw** a `QueueFullException`.
-   * Else, put customer at `chairs[count]` and increase `count`. Print "Customer sat down."
-3. Write `getNextCustomer()`:
-   * If `count == 0`, return null.
-   * Save `chairs[0]` to a temporary variable.
-   * **Shift Left:** Use a loop: `chairs[0] = chairs[1]; chairs[1] = chairs[2]; chairs[2] = null;`
-   * Decrease `count` by 1.
-   * Return the saved customer.
+1. Private variables: `Barber[] barbers` (size 2), `Shop shop`, `Statistics stats`, `tick`.
+2. `newCustomer()`: make a Customer and call `shop.walkIn(...)`. If `QueueFullException` comes, call `stats.recordLost()`. Print messages in manual mode.
+3. `advanceOneTick()`: if `tick` is 20, throw `ShopClosedException`. Otherwise do the 3 steps from Rule 5. When `workOneTick()` returns true, call `stats.recordServed()`.
+4. `showStatus()`: print the tick, the chairs, each barber, and the totals.
+5. `runRandomDays(int days)`: for each day, make new barbers and a new shop, set tick to 0, and loop 20 times: with 40% chance call `newCustomer()` (silent), then `advanceOneTick()`. Call `stats.endDay()` at the end of each day. After all days, print the averages.
+6. Main class: menu in a loop, with try/catch for both exceptions. Use ONE Scanner.
 
-### PERSON 4: Main Simulation Engine
+**Menu:**
 
-**What this class is for:** Running the clock loop.
-**Steps:**
+```
+1. Advance time by 1 tick
+2. New customer arrives
+3. Show shop status
+4. Run 100 random days (Monte Carlo)
+5. Stop program
+```
 
-1. Setup the Barbers and the Shop.
-2. Create a loop: `for(int tick = 1; tick <= 20; tick++)` (simulating 20 minutes).
-3. Inside the loop:
-   * Ask the user via text menu: "Tick " + tick + ": Press 1 to advance time, Press 2 to spawn a new customer."
-   * If they choose 2: Create a customer. Call `shop.walkIn()`. Catch the `QueueFullException` if chairs are full and print "Customer left angry!".
-   * Check Barbers: If a barber `isFree()`, call `shop.getNextCustomer()`. If it returns a customer, call `barber.startCut()`.
-   * If a barber is not free, call `barber.workOneTick()`.
+## DEMO: your group must show all 6
 
-### DEMO: Your group must show these test cases
-
-1. Spawn a customer. Advance time. Show the Senior barber finishing in 1 tick, while Junior takes 3.
-2. Spawn 4 customers in a row without advancing time. Show the 4th customer triggering the `QueueFullException` and leaving.
-3. Show the "Shift Left" array logic working (Customer 2 moves to Chair 1 when Customer 1 goes to the barber).
+1. Add 2 customers. Advance time. Show that both barbers took a customer. Advance again: the Senior barber finishes after 1 tick. Advance 2 more times: the Junior barber finishes after 3 ticks.
+2. Add 4 customers without advancing time. The 4th must show "customer leaves angry". Show that the lost count is 1.
+3. Add 3 customers, then advance one tick. Show that the 3rd customer moved to the first chair (shift left).
+4. Advance the clock to 20. Add a customer. The "shop closed" message must show. Advance again. The same message must show.
+5. Run 100 random days. Show the average served and lost customers.
+6. Run it again. The numbers must be a little different. Explain why (random arrivals).

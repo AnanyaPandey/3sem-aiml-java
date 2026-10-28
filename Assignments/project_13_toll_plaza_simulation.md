@@ -26,78 +26,112 @@
 
 ------
 
-## PROJECT 13: TOLL PLAZA SIMULATION (MONTE CARLO)
+# PROJECT 13: TOLL PLAZA SIMULATION (MONTE CARLO)
 
-### What you will make
+## What you will make
 
-Similar to Project 12, but for traffic. Cars and trucks queue up at a toll plaza. Booths process them based on vehicle type.
+A toll plaza with 2 booths. Cars and trucks wait in a lane of 5 places. A truck pays more and takes more time. Like Project 12, you can run it by hand, or run 100 random days and see the average money collected.
 
-### Starting data
+## Starting data
 
-1. 2 Toll Booths.
-2. A waiting lane that holds 5 vehicles.
+1. 2 toll booths: "Booth 1" and "Booth 2".
+2. A waiting lane with 5 places (an array of size 5).
 
-### Rules
+## Rules
 
-1. A Car pays Rs 50 and takes 1 tick to process.
-2. A Truck pays Rs 150 and takes 3 ticks to process.
+1. A Car pays Rs 50 and needs 1 tick. A Truck pays Rs 150 and needs 3 ticks.
+2. The vehicle type is typed by the user as text: "CAR" or "TRUCK" (any letter case). Anything else is not allowed.
+3. If the lane is full when a vehicle arrives, the vehicle is lost (it turns away).
+4. A booth collects the fee when it starts to process a vehicle.
+5. Every time the clock moves by one tick, do these steps in this exact order:
+   - Add 1 to the tick.
+   - Every booth that is busy works one tick.
+   - Every booth that is free takes the next vehicle from the lane (if there is one).
+6. A day has 20 ticks.
+7. In automatic mode, at every tick a vehicle arrives with a 50% chance. If it arrives, it is a car with 70% chance and a truck with 30% chance.
+8. Classes do not print messages inside `arrive` and `workOneTick`. The Simulation prints.
 
-### PERSON 1: Booth and Exceptions
+## PERSON 1: Booth and the exceptions
 
-**What this class is for:** Where the money is collected.
+**What this class is for:** The place where money is collected.
+
 **Steps:**
 
-1. Private variables: `boothName`, `int totalMoneyCollected`, `int timeUntilFree`, `Vehicle currentVehicle`.
-2. Write `isFree()`: returns true if `timeUntilFree == 0`.
-3. Write `processVehicle(Vehicle v)`:
-   * Increase `totalMoneyCollected` by `v.getTollFee()`.
-   * Set `timeUntilFree = v.getProcessTime()`.
-4. Write `workOneTick()`: reduce `timeUntilFree` by 1 if it is > 0.
-5. **Make 2 custom exceptions:**
-   * `LaneFullException`: "The waiting lane is completely full."
-   * `InvalidVehicleException`: "System does not recognize this vehicle type."
+1. Private variables: `boothName`, `totalMoneyCollected`, `timeUntilFree`, `vehiclesProcessed`.
+2. Constructor takes the booth name. Make getters.
+3. `isFree()`: true if `timeUntilFree` is 0.
+4. `processVehicle(Vehicle v)`: add `v.getTollFee()` to `totalMoneyCollected`, set `timeUntilFree` to `v.getProcessTime()`, and add 1 to `vehiclesProcessed`.
+5. `workOneTick()`: if `timeUntilFree` is more than 0, subtract 1.
+6. `toString()`: shows name, "Free" or "Busy (N ticks left)", and money collected.
+7. Make 2 custom exceptions:
+   - `LaneFullException`: message "The waiting lane is full, vehicle turns away".
+   - `InvalidVehicleException`: message "System does not recognize this vehicle type".
 
-### PERSON 2: Vehicle classes
+**How to test your part:** Process one truck. Check `isFree()`, call `workOneTick()` 3 times, and check again. Check the money.
 
-**What this class is for:** Defines the traffic using Polymorphism.
+## PERSON 2: Vehicle, Car and Truck
+
+**What this class is for:** Different vehicles have different fees and times.
+
 **Steps:**
 
-1. Make an `abstract class Vehicle`.
-2. Private variables: `licensePlate` (String).
-3. Abstract methods: `public abstract int getTollFee();` and `public abstract int getProcessTime();`
-4. Make child `Car`: fee returns 50, process time returns 1.
-5. Make child `Truck`: fee returns 150, process time returns 3.
+1. Make an abstract class `Vehicle`.
+2. Private variable: `licensePlate`. Constructor and `getLicensePlate()`.
+3. Abstract methods: `getTollFee()`, `getProcessTime()` and `getVehicleType()`.
+4. `Car`: fee 50, time 1, type "CAR".
+5. `Truck`: fee 150, time 3, type "TRUCK".
+6. `toString()` in Vehicle: example `TRUCK CG17AB1234 (Rs. 150)`.
 
-### PERSON 3: Plaza (The Waiting Lane)
+**How to test your part:** Make a car and a truck. Put both in a `Vehicle[]` array and print the fee of each with a loop. This is polymorphism.
 
-**What this class is for:** The manual array queue for traffic.
+## PERSON 3: Plaza and Statistics
+
+**What these classes are for:** The Plaza is the waiting lane. The Statistics keeps the numbers.
+
+**Plaza steps:**
+
+1. Private variables: `Vehicle[] lane = new Vehicle[5]`, `count`.
+2. `arrive(Vehicle v)`: if the lane is full, throw `LaneFullException`. Otherwise store it.
+3. `letNextVehicleGo()`: if `count` is 0, return null. Otherwise save `lane[0]`, move every vehicle one place to the left with a loop (it must work for any lane size), set the last used place to null, subtract 1 from `count`, and return the saved vehicle.
+4. `hasVehicles()`, `getCount()` and `showLane()`.
+
+**Statistics steps:**
+
+1. Private variables: `lostVehicles`, `daysRun`, `totalMoney`.
+2. `recordLost()`, `addMoney(int m)` and `endDay()`.
+3. `printAverages()`: prints average money per day and average lost vehicles per day. (If `daysRun` is 0, print a message.)
+
+**How to test your part:** Add 6 vehicles. The 6th must give the exception. Call `letNextVehicleGo()` 6 times. The 6th call must return null.
+
+## PERSON 4: Simulation and Main
+
+**What this class is for:** To run the clock and connect everything.
+
 **Steps:**
 
-1. Private variables: `Vehicle[] lane = new Vehicle[5];`, `int count = 0;`
-2. Write `arrive(Vehicle v)`:
-   * If `count == 5`, **throw** `LaneFullException`.
-   * Else, put at `lane[count]`, increase count.
-3. Write `letNextVehicleGo()`:
-   * Grab `lane[0]`.
-   * **Shift Left:** loop from 0 to 3, setting `lane[i] = lane[i+1]`. Set `lane[4] = null`.
-   * Decrease count. Return the vehicle.
+1. Private variables: `Booth[] booths` (size 2), `Plaza plaza`, `Statistics stats`, `tick`.
+2. `createVehicle(String type, String plate)`: if the type is "CAR" make a Car, if "TRUCK" make a Truck, otherwise throw `InvalidVehicleException`.
+3. `addVehicle(Vehicle v)`: call `plaza.arrive(v)`. If `LaneFullException` comes, call `stats.recordLost()` and print the message.
+4. `advanceOneTick()`: do the 3 steps from Rule 5.
+5. `showStatus()`: print the tick, the lane, each booth, and the money collected by all booths.
+6. `runRandomDays(int days)`: for each day, make new booths and a new plaza, loop 20 ticks (with the arrival chances from Rule 7), add the day's money to `stats`, and call `endDay()`. At the end, print the averages.
+7. Main class: menu in a loop, with try/catch for both exceptions. Use ONE Scanner.
 
-### PERSON 4: Main Simulation Engine
+**Menu:**
 
-**What this class is for:** Running the time ticks.
-**Steps:**
+```
+1. Add a vehicle (type CAR or TRUCK, then the number plate)
+2. Advance time by 1 tick
+3. Show status
+4. Run 100 random days (Monte Carlo)
+5. Stop program
+```
 
-1. Setup the array of 2 Booths and the Plaza lane.
-2. Create a loop: `for(int tick = 1; tick <= 20; tick++)`.
-3. Inside the loop:
-   * Menu: 1. Spawn Car, 2. Spawn Truck, 3. Advance Time.
-   * If spawning: create object, call `plaza.arrive()`. Catch `LaneFullException`.
-   * If advancing time: Loop through the 2 booths. If a booth `isFree()`, check if plaza has vehicles. If yes, `letNextVehicleGo()` and give it to the booth using `processVehicle()`. If booth is busy, call `workOneTick()`.
-4. At the end, print the `totalMoneyCollected` from all booths.
+## DEMO: your group must show all 6
 
-### DEMO: Your group must show these test cases
-
-1. Spawn a Car and a Truck. Show the Truck taking longer to clear the booth than the car.
-2. Spawn 6 vehicles instantly. Show the 6th one throwing the `LaneFullException`.
-3. Show Polymorphism working (the booth just asks `getTollFee()` and gets different prices).
-4. Print the final collected revenue accurately.
+1. Add one car and one truck. Advance time. Show that the truck keeps its booth busy for 3 ticks and the car only for 1.
+2. Add 6 vehicles without advancing time. The 6th must show the "lane is full" message.
+3. Type the vehicle type "BUS". The "does not recognize" message must show.
+4. Explain polymorphism: the booth only asks `getTollFee()`, and the car and the truck give different answers.
+5. Show the total money of both booths, and check it on paper.
+6. Run 100 random days. Show the average money per day. Run again to show that the result changes a little.

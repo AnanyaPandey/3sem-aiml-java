@@ -26,75 +26,109 @@
 
 ------
 
-## PROJECT 15: GEOMETRY SHAPES TOOLKIT
+# PROJECT 15: GEOMETRY SHAPES TOOLKIT
 
-### What you will make
+## What you will make
 
-A mathematical tool where a user can generate geometric shapes, store them in a list, and ask the system to calculate total areas and perimeters using Polymorphism.
+A program where the user creates shapes (circle, rectangle, triangle), keeps them in an array, and asks for areas, perimeters, a search by ID, and a full report.
 
-### Starting data
+## Starting data
 
-1. An empty array capable of holding 10 shapes.
+1. An empty array that can hold 10 shapes.
 
-### Rules
+## Rules
 
-1. A dimension (radius, length, width, side) cannot be negative or zero.
+1. Every dimension (radius, length, width, side) must be more than 0.
+2. A triangle must be possible: the sum of any two sides must be MORE than the third side. (Sides 1, 1, 10 are not allowed.)
+3. The check is done inside the constructor of each shape. So a wrong shape can never be made, anywhere in the program.
+4. Shape IDs are automatic: SH1, SH2, SH3... (If a wrong shape fails, one number may be skipped. This is fine.)
+5. Use 3.14159 for pi.
 
-### PERSON 1: Shape, Circle, Rectangle
+## Order of work
 
-**What this class is for:** The mathematical foundations.
+Person 2 writes the two exceptions FIRST (15 minutes) and gives them to the group, because Person 1 and Person 3 need them.
+
+## PERSON 1: Shape, Circle and Rectangle
+
+**What this class is for:** The base of all shapes.
+
 **Steps:**
 
-1. Make an `abstract class Shape`.
-2. Private variables: `shapeId` (String), `color` (String).
-3. Constructor and getters.
-4. Abstract methods: `public abstract double calculateArea();` and `public abstract double calculatePerimeter();`
-5. Make child `Circle`:
-   * Private variable `radius`.
-   * `calculateArea()` returns `3.14159 * radius * radius`.
-   * `calculatePerimeter()` returns `2 * 3.14159 * radius`.
-6. Make child `Rectangle`:
-   * Private variables `length`, `width`.
-   * `calculateArea()` returns `length * width`.
-   * `calculatePerimeter()` returns `2 * (length + width)`.
+1. Make an abstract class `Shape`.
+2. Private variables: `shapeId` and `color`. Use a static counter to make the ID automatically.
+3. Constructor takes the color. Make getters.
+4. Abstract methods: `getShapeName()`, `calculateArea()`, `calculatePerimeter()`.
+5. `toString()` in Shape: example `SH2  Circle  (red)  Area: 78.54  Perimeter: 31.42`. Use `String.format("%.2f", ...)`.
+6. `Circle`: private variable `radius`. The constructor takes color and radius, and throws `InvalidDimensionException` if radius is 0 or less (write `throws InvalidDimensionException` after the constructor). Area is `3.14159 * radius * radius`. Perimeter is `2 * 3.14159 * radius`.
+7. `Rectangle`: private variables `length`, `width`. Same check in the constructor. Area is `length * width`. Perimeter is `2 * (length + width)`.
+8. Make getters for radius, length and width.
 
-### PERSON 2: Triangle and Exceptions
+**How to test your part:** Make a circle and a rectangle and print them. Try radius 0 and length -5. The exception must come.
 
-**What this class is for:** Triangle math and error handling.
+## PERSON 2: Triangle, Report and the exceptions
+
+**What these classes are for:** The triangle with its extra check, the final report, and the two exceptions.
+
 **Steps:**
 
-1. Make child `Triangle` (extends Shape):
-   * Private variables `sideA`, `sideB`, `sideC`.
-   * `calculatePerimeter()` returns `a + b + c`.
-   * `calculateArea()` use Heron's formula: `s = perimeter / 2`. Area = `Math.sqrt(s * (s-a) * (s-b) * (s-c))`.
-2. **Make 2 custom exceptions:**
-   * `InvalidDimensionException`: "Dimensions must be greater than zero."
-   * `ShapeNotFoundException`: "No shape exists with that ID."
+1. Make the 2 custom exceptions. Each one has a constructor that takes a message and sends it to `super(message)`:
+   - `InvalidDimensionException`.
+   - `ShapeNotFoundException`.
+2. `Triangle` extends Shape. Private variables `sideA`, `sideB`, `sideC`.
+3. In the constructor: if any side is 0 or less, throw `InvalidDimensionException` with the message "Dimensions must be more than 0". If the sum of any two sides is not more than the third side, throw it with the message "These sides cannot make a triangle".
+4. `calculatePerimeter()`: `a + b + c`.
+5. `calculateArea()`: Heron's formula. `s = perimeter / 2`. Area = `Math.sqrt(s * (s-a) * (s-b) * (s-c))`.
+6. Make `getShapeName()` and getters for the sides.
+7. `Report` class: the constructor takes a `ShapeCollection`. `printReport()` prints: number of shapes, every shape, total area, total perimeter, and the largest shape. If there are no shapes, print "No shapes to report".
 
-### PERSON 3: Shape Collection
+**How to test your part:** Make a triangle 3, 4, 5. The area must be 6. Try 1, 1, 10 and check the exception.
 
-**What this class is for:** Managing the array of shapes.
+## PERSON 3: ShapeCollection
+
+**What this class is for:** To keep the array of shapes and to calculate with all of them.
+
 **Steps:**
 
-1. Private variables: `Shape[] myShapes = new Shape[10];`, `int count = 0;`
-2. Write `addShape(Shape s)`: adds to the array.
-3. Write `getTotalArea()`: loops through from 0 to `count`. Adds up `myShapes[i].calculateArea()` into a total sum and returns it.
-4. Write `getLargestShape()`: loops through and finds the shape with the highest area. Returns that Shape object.
+1. Private variables: `Shape[] shapes = new Shape[10]`, `count`.
+2. `addShape(Shape s)`: if the array is full, print "Collection is full (10 shapes)" and stop. Otherwise store it.
+3. `getCount()` and `getShapeAt(int index)`.
+4. `findShape(String id)`: search by ID. If not found, throw `ShapeNotFoundException` with the message "No shape exists with that ID".
+5. `getTotalArea()` and `getTotalPerimeter()`: loop and add up the values. Each shape's own formula runs (polymorphism).
+6. `getLargestShape()`: return the shape with the biggest area. If there are no shapes, return null.
+7. `showAll()`: print every shape. If empty, print "No shapes yet".
 
-### PERSON 4: Main Menu UI
+**How to test your part:** Add 3 shapes and check the totals on paper. Call `getLargestShape()` on an empty collection. It must not crash.
 
-**What this class is for:** Text inputs and calling the functions.
+## PERSON 4: Main
+
+**What this class is for:** To take input and call the other classes.
+
 **Steps:**
 
-1. Show a menu: 1. Add Circle, 2. Add Rectangle, 3. Add Triangle, 4. Show Total Area, 5. Show Largest Shape.
-2. Use `Scanner` to ask for the dimensions based on the choice.
-3. **Crucial Validation:** Before you use `new Circle(radius)`, check the user's input. If `radius <= 0`, **throw** an `InvalidDimensionException`.
-4. Put the input logic inside a `try/catch`. If they enter a negative number, catch your exception, print the message, and return to the main menu.
-5. If valid, call `collection.addShape()`.
+1. Create ONE `Scanner` and one `ShapeCollection`.
+2. For options 1 to 3: ask the color and the dimensions. Read numbers as text and use `Double.parseDouble` inside `try/catch` (letters must not crash the program).
+3. Do NOT check the dimensions in Main. Just call `new Circle(...)` and so on, and catch `InvalidDimensionException` and print its message.
+4. For option 5: ask for an ID, call `findShape`, and catch `ShapeNotFoundException`.
+5. For option 6: make a `Report` and call `printReport()`.
 
-### DEMO: Your group must show these test cases
+**Menu:**
 
-1. Add one Circle, one Rectangle, and one Triangle successfully.
-2. Call "Show Total Area". Explain how the system used Polymorphism to call the correct formula for each shape in the loop.
-3. Try to create a Rectangle with a length of `-5`. Show your `InvalidDimensionException` catching it.
-4. Call "Show Largest Shape" and print its details.
+```
+1. Add circle
+2. Add rectangle
+3. Add triangle
+4. Show all shapes
+5. Find a shape by ID
+6. Show report
+7. Stop program
+```
+
+## DEMO: your group must show all 7
+
+1. Add one circle, one rectangle and one triangle.
+2. Show all shapes and the report. Explain how polymorphism calls the right formula for each shape.
+3. Add a rectangle with length -5. The message must show, and the program must go back to the menu.
+4. Add a triangle with sides 1, 1, 10. The "cannot make a triangle" message must show.
+5. Find a shape by a good ID, and then by "SH99". The "no shape" message must show.
+6. Show the report when there are no shapes. The program must not crash.
+7. Add 10 shapes, then try an 11th. The "collection is full" message must show.

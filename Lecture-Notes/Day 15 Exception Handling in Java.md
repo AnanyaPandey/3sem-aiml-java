@@ -286,3 +286,324 @@ This combines everything above: `throws` on the method signature, `throw` to man
 | Checked by              | Compiler, at compile time              | Not enforced by compiler                                     |
 | Must handle or declare? | Yes — code won't compile otherwise     | No — up to the programmer                                    |
 | Examples                | `IOException`, `FileNotFoundException` | `ArithmeticException`, `NullPointerException`, `ArrayIndexOutOfBoundsException`, `NumberFormatException` |
+
+### Most useful checked exceptions (for Syllabus)
+
+**1. File and I/O (java.io)**
+
+- `IOException`: parent of most input/output problems. Reading or writing files, streams, console.
+- `FileNotFoundException`: file does not exist or cannot be opened. Used with `FileReader`, `FileInputStream`, `Scanner(File)`.
+- `EOFException`: end of file reached unexpectedly while reading.
+- `UnsupportedEncodingException`: wrong character encoding name.
+
+**2. Threads**
+
+- `InterruptedException`: thrown by `Thread.sleep()`, `join()`, `wait()`. Students meet this very early.
+
+**3. Class and reflection**
+
+- `ClassNotFoundException`: `Class.forName("...")` cannot find the class.
+- `CloneNotSupportedException`: calling `clone()` on a class that does not implement `Cloneable`.
+- `InstantiationException` and `IllegalAccessException`: creating an object using reflection fails.
+- `NoSuchMethodException` and `NoSuchFieldException`: method or field not found using reflection.
+
+**4. Database**
+
+- `SQLException`: any JDBC problem such as connection, query, or table errors.
+
+**5. Network**
+
+- `MalformedURLException`: wrong URL format.
+- `UnknownHostException`: host name cannot be resolved.
+- `SocketException`: problem in socket connection.
+- `URISyntaxException`: wrong URI format.
+
+**6. Parsing and security**
+
+- `ParseException` (java.text): cannot parse a date or number from a String.
+- `NoSuchAlgorithmException`: wrong algorithm name, for example in `MessageDigest.getInstance("MD5")`.
+
+**7. Concurrency (java.util.concurrent)**
+
+- `ExecutionException`: a task running in an executor threw an exception.
+- `TimeoutException`: waiting for a result took too long.
+
+### Top 5 to focus 
+
+1. `IOException`
+2. `FileNotFoundException`
+3. `InterruptedException`
+4. `ClassNotFoundException`
+5. `SQLException`
+
+### More checked exceptions
+
+**1. File handling (java.io and java.nio.file)**
+
+- `NotSerializableException`: saving an object whose class does not implement `Serializable`.
+- `InvalidClassException`, `StreamCorruptedException`: problems when reading saved objects.
+- `NoSuchFileException`: file or path missing (with `Files.readAllLines()`, `Files.copy()`).
+- `FileAlreadyExistsException`: creating a file that already exists.
+- `AccessDeniedException`: no permission to read or write.
+- `DirectoryNotEmptyException`: deleting a folder that still has files.
+- `UTFDataFormatException`, `CharConversionException`: bad text encoding data.
+- `ZipException` (java.util.zip): corrupt zip file.
+
+**2. Network (java.net)**
+
+- `ConnectException`: server refused or is not reachable.
+- `SocketTimeoutException`: connection or read took too long.
+- `BindException`: port already in use.
+- `ProtocolException`: wrong HTTP method or protocol.
+
+**3. Database (java.sql), all are children of `SQLException`**
+
+- `SQLSyntaxErrorException`: wrong SQL query.
+- `SQLIntegrityConstraintViolationException`: duplicate primary key, foreign key failure.
+- `SQLTimeoutException`: query took too long.
+- `BatchUpdateException`: failure in batch insert or update.
+
+**4. Reflection**
+
+- `ReflectiveOperationException`: parent of `ClassNotFoundException`, `NoSuchMethodException`, `InstantiationException` and others.
+- `InvocationTargetException`: the method called through reflection itself threw an exception.
+
+**5. Concurrency**
+
+- `BrokenBarrierException`: used with `CyclicBarrier`.
+- `ExecutionException`, `TimeoutException`: used with `Future` and `ExecutorService`.
+
+**6. Security and encryption**
+
+- `GeneralSecurityException`: parent of most security exceptions.
+- `InvalidKeyException`, `NoSuchPaddingException`, `BadPaddingException`, `IllegalBlockSizeException`: used in AES/RSA encryption.
+- `NoSuchProviderException`, `KeyStoreException`, `CertificateException`, `SignatureException`.
+
+**7. XML and other libraries**
+
+- `ParserConfigurationException`, `SAXException`, `TransformerException`: XML parsing.
+- `NamingException` (javax.naming): JNDI lookups, used in enterprise apps.
+- `MessagingException` (JavaMail, external library): sending email.
+- `LineUnavailableException`, `UnsupportedAudioFileException` (javax.sound): audio programs.
+- `AWTException`, `PrinterException`: GUI and printing.
+
+### Part B: Unchecked exceptions (very useful later)
+
+Compiler does not force you to handle these, but they are the most common in real programs.
+
+**Basic**
+
+- `NullPointerException`: using an object that is null.
+- `ArithmeticException`: divide by zero (integers).
+- `ArrayIndexOutOfBoundsException`, `StringIndexOutOfBoundsException`, `IndexOutOfBoundsException`: wrong index.
+- `NegativeArraySizeException`: creating an array with negative size.
+- `ArrayStoreException`: storing wrong type in an array.
+- `ClassCastException`: wrong type casting.
+- `NumberFormatException`: `Integer.parseInt("abc")`.
+
+**Argument and state checks (good for your own classes)**
+
+- `IllegalArgumentException`: method received a bad value, e.g. negative amount in `deposit()`.
+- `IllegalStateException`: method called at wrong time, e.g. withdrawing from a closed account.
+- `UnsupportedOperationException`: operation not allowed, e.g. `List.of(...).add()`.
+
+**Collections and input**
+
+- `ConcurrentModificationException`: changing a list while looping over it.
+- `NoSuchElementException`: `iterator.next()` or `Scanner.next()` with nothing left.
+- `InputMismatchException`: `Scanner.nextInt()` but user typed text.
+- `EmptyStackException`: `pop()` on an empty `Stack`.
+
+**Date, text and others**
+
+- `DateTimeException`, `DateTimeParseException`: wrong date or time.
+- `PatternSyntaxException`: wrong regex pattern.
+- `UncheckedIOException`: wraps `IOException` inside streams and lambdas.
+- `SecurityException`: action not permitted.
+- `IllegalMonitorStateException`: wrong use of `wait()` or `notify()`.
+- `CompletionException`, `CancellationException`, `RejectedExecutionException`: concurrency tasks.
+
+### Part C: Errors (not exceptions, but students must know)
+
+These extend `Error`. You normally do not catch them.
+
+- `StackOverflowError`: infinite recursion.
+- `OutOfMemoryError`: heap is full.
+- `AssertionError`: failed `assert` statement.
+- `NoClassDefFoundError`: class was there at compile time but missing at run time.
+- `ExceptionInInitializerError`: exception inside a static block.
+- `UnsupportedClassVersionError`: class compiled with newer Java than the one running it.
+
+### Part D: Hierarchy in one view
+
+```
+Throwable
+ ├── Error (do not handle)
+ └── Exception
+      ├── Checked: IOException, SQLException, InterruptedException, ...
+      └── RuntimeException (unchecked)
+           ├── NullPointerException
+           ├── IllegalArgumentException
+           └── ...
+```
+
+Important point: catching a parent also catches all its children. `catch (IOException e)` will also catch `FileNotFoundException`. Always put the child catch block first.
+
+### Difference in THROW and THROWS
+
+### Main difference
+
+1. **`throw`** is a statement. It actually creates and throws one exception object at that moment.
+2. **`throws`** is a warning in the method declaration. It tells the caller: “this method may throw this exception, so you must handle it.”
+
+Simple way to remember: `throw` = do it, `throws` = may happen.
+
+### Comparison table
+
+| Point                           | `throw`                                   | `throws`                                        |
+| ------------------------------- | ----------------------------------------- | ----------------------------------------------- |
+| Where used                      | Inside method body                        | In method signature (after parentheses)         |
+| Purpose                         | Throws an exception object                | Declares possible exceptions                    |
+| Followed by                     | An object: `throw new Exception("msg")`   | Class names: `throws IOException, SQLException` |
+| How many                        | One at a time                             | Many, separated by commas                       |
+| Needed for checked exceptions   | Yes, either handle it or declare `throws` | Yes, this is how you declare                    |
+| Needed for unchecked exceptions | Optional                                  | Optional                                        |
+
+### Using `throw`
+
+java
+
+```java
+public class Test {
+    static void checkAge(int age) {
+        if (age < 18) {
+            throw new IllegalArgumentException("Age must be 18 or more");
+        }
+        System.out.println("Allowed");
+    }
+
+    public static void main(String[] args) {
+        checkAge(15);
+    }
+}
+```
+
+`IllegalArgumentException` is unchecked, so `throws` is not required here.
+
+### Using `throws`
+
+java
+
+```java
+import java.io.*;
+
+public class Test {
+    static void readFile() throws FileNotFoundException {
+        FileReader fr = new FileReader("data.txt");
+    }
+
+    public static void main(String[] args) {
+        try {
+            readFile();
+        } catch (FileNotFoundException e) {
+            System.out.println("File not found");
+        }
+    }
+}
+```
+
+`readFile()` does not handle the exception. It passes the responsibility to the caller, and `main` handles it.
+
+### Using both together (most common in real code)
+
+This works well with the Bank Account class test idea. First make a custom checked exception:
+
+java
+
+```java
+class InsufficientBalanceException extends Exception {
+    public InsufficientBalanceException(String msg) {
+        super(msg);
+    }
+}
+```
+
+Then the account class:
+
+java
+
+```java
+class Account {
+    private double balance;
+
+    public Account(double balance) {
+        this.balance = balance;
+    }
+
+    // throws: warning in signature
+    public void withdraw(double amount) throws InsufficientBalanceException {
+        if (amount > balance) {
+            // throw: actually creates and throws the exception
+            throw new InsufficientBalanceException("Not enough balance");
+        }
+        balance = balance - amount;
+    }
+}
+```
+
+And the caller:
+
+java
+
+```java
+public class Main {
+    public static void main(String[] args) {
+        Account a = new Account(1000);
+        try {
+            a.withdraw(5000);
+        } catch (InsufficientBalanceException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+    }
+}
+```
+
+**Output:**
+
+```
+Error: Not enough balance
+```
+
+### Step by step flow
+
+1. `main` calls `withdraw(5000)`.
+2. Inside `withdraw`, the `if` condition is true.
+3. `throw new InsufficientBalanceException(...)` creates the object and throws it.
+4. The method stops immediately. The next lines do not run.
+5. Because the signature has `throws`, the compiler allows this and forces the caller to handle it.
+6. `catch` in `main` receives the object and prints the message.
+
+### Common mistakes students make
+
+1. **Writing `throws` and `throw` mixed up.** `throw new ...` has `new` and an object. `throws` has only class names.
+2. **Forgetting `throws` for a checked exception.** The code will not compile:
+
+java
+
+```java
+static void test() {
+    throw new Exception("error");   // compile error
+}
+```
+
+Fix: add `throws Exception` or use `try-catch` inside.
+
+3. **Writing code after `throw`.** Lines directly after `throw` are unreachable and give a compile error.
+4. **Using `throws` with a new keyword:** `throws new Exception()` is wrong.
+
+### Extra points
+
+- `main` can also have `throws`: `public static void main(String[] args) throws IOException`. Then the JVM handles it, and the program crashes with an error message if the exception occurs. Fine for quick demos, but not good practice.
+- You can re-throw a caught exception: `catch (IOException e) { throw e; }`.
+- Overriding rule: an overriding method cannot declare a broader checked exception than the parent method.
+

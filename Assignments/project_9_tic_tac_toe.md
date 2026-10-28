@@ -3,7 +3,7 @@
 1. Work in a group of 4. Each person makes ONE main part (one or more classes, as written in your project). Write your name in a comment at the top of your class.
 2. Use only Java. Use arrays to store many things (many spots, many books, many accounts). Do not use ArrayList, HashMap, or any database.
 3. Your project must use these 5 things. Here is what each one means:
-   - **Private variables with getters (encapsulation):** Make your variables private. Give a public method (getter) to read each one. Example: `private String spotId;` and `public String getSpotId()`.
+   - **Private variables with getters (encapsulation):** Make your variables private. Give a public method (getter) to read each one. Example: `private String spotId;` and `public String getSpotId()`
    - **Inheritance:** One parent class, and child classes that extend it. Example: Vehicle is the parent. Car and Bike are children.
    - **Overriding:** The parent has a method. Each child writes its own version of the same method. Example: `getHourlyRate()` gives 20 in Car and 10 in Bike.
    - **Abstract class:** A parent class that you never create objects of directly. You write `abstract` before the class name. Example: `abstract class Vehicle`.
@@ -26,81 +26,104 @@
 
 ------
 
-## PROJECT 9: TIC-TAC-TOE
+# PROJECT 9: TIC-TAC-TOE
 
-### What you will make
+## What you will make
 
-A digital 3x3 game board where a human can play against another human or against a computer bot that makes random valid moves.
+A 3x3 game. A human plays against another human, or against a computer that picks random moves. The program keeps a score of wins.
 
-### Starting data
-
-1. A 3x3 character array filled with empty spaces (`' '`).
-
-### Rules
+## Rules of the game
 
 1. X always goes first.
-2. A player cannot place a mark on a cell that already has an X or O.
-3. If the board fills up and no one has 3-in-a-row, it is a Draw.
+2. A mark cannot be placed on a cell that is already used.
+3. Row and column are numbers from 0 to 2.
+4. 3 same marks in a row, in a column or in a diagonal is a win. If the board is full and nobody won, it is a draw.
 
-### PERSON 1: Board class and Exceptions
+## PERSON 1: Board and the exceptions
 
-**What this class is for:** Managing the 2D grid.
+**What this class is for:** To keep the 3x3 grid and to protect it.
+
 **Steps:**
 
-1. Make a private variable: `char[][] grid = new char[3][3];`
-2. Write `initializeBoard()`: use nested `for` loops to set every cell to `' '` (a space).
-3. Write `printBoard()`: use loops to print the board. Example output format: `X | O |   `
-4. Write `isBoardFull()`: loops through all 9 cells. If it finds even one `' '`, return `false`. If it finishes the loop without finding any spaces, return `true`.
-5. Write `placeMark(int row, int col, char mark)`:
-   * If row or col is less than 0 or greater than 2, **throw** an `InvalidMoveException`.
-   * If `grid[row][col]` is not `' '`, **throw** a `CellOccupiedException`.
-   * Else, set `grid[row][col] = mark`.
-6. **Make 2 custom exceptions:** `InvalidMoveException` and `CellOccupiedException`.
+1. Private variable: `char[][] grid = new char[3][3]`.
+2. Constructor calls `reset()`.
+3. `reset()`: use nested loops to set every cell to `' '`.
+4. `getCell(int row, int col)`: returns the character in that cell. (Other classes need this, because `grid` is private.)
+5. `placeMark(int row, int col, char mark)`:
+   - If row or col is less than 0 or more than 2, throw `InvalidMoveException`.
+   - If the cell is not `' '`, throw `CellOccupiedException`.
+   - Otherwise, set the mark.
+6. `isFull()`: false if any cell is `' '`, otherwise true.
+7. `printBoard()`: print the grid in a neat way, for example `X | O |  `.
+8. Make 2 custom exceptions:
+   - `InvalidMoveException`: message "Row and column must be from 0 to 2".
+   - `CellOccupiedException`: message "This cell is already used".
 
-### PERSON 2: Player classes
+**How to test your part:** Place a mark. Place another one on the same cell. Place one on row 5. Both exceptions must come.
 
-**What this class is for:** Separates how humans pick their move versus how a computer picks a move.
+## PERSON 2: Player, HumanPlayer and ComputerPlayer
+
+**What this class is for:** A human and a computer choose a move in different ways.
+
 **Steps:**
 
-1. Make an `abstract class Player`.
-2. Private variables: `name` (String), `mark` (char, either 'X' or 'O').
-3. Constructor taking name and mark.
-4. Abstract method: `public abstract int[] getMove();` (returns an array of 2 integers: row and col).
-5. Make child `HumanPlayer`:
-   * `getMove()` asks the user: "Enter row (0-2):" and "Enter col (0-2):" using `Scanner`. Returns `new int[]{row, col}`.
-6. Make child `ComputerPlayer`:
-   * `getMove()` uses `Math.random()`. Multiply by 3 and cast to `int` to get a random number between 0 and 2 for both row and col. Print "Computer chooses row X, col Y". Return `new int[]{row, col}`.
+1. Make an abstract class `Player`.
+2. Private variables: `name`, `mark` ('X' or 'O').
+3. Constructor takes name and mark. Make getters `getName()` and `getMark()`.
+4. Abstract method: `public abstract int[] getMove();` It returns an array with row and col.
+5. Child `HumanPlayer`:
+   - The constructor also takes the shared `Scanner` from Main.
+   - `getMove()` asks "Enter row (0-2):" and "Enter col (0-2):", reads text, and uses `Integer.parseInt`.
+   - If the user types letters, catch `NumberFormatException` and return `{-1, -1}`. (The Board will then throw `InvalidMoveException`.)
+6. Child `ComputerPlayer`:
+   - `getMove()` uses `Math.random()` to get a row and a col from 0 to 2.
+   - Print "Computer chooses row R, col C".
 
-### PERSON 3: Game Logic class
+**How to test your part:** Call `getMove()` of both players and print the result. Type letters as input once.
 
-**What this class is for:** Checking the win conditions.
+## PERSON 3: Game
+
+**What this class is for:** To run one full game: turns, win check and draw check.
+
 **Steps:**
 
-1. You need a method `boolean checkWin(Board board, char mark)`.
-2. Check rows: loop `i` from 0 to 2. If `grid[i][0] == mark && grid[i][1] == mark && grid[i][2] == mark`, return true.
-3. Check columns: loop `j` from 0 to 2. If `grid[0][j] == mark && grid[1][j] == mark && grid[2][j] == mark`, return true.
-4. Check diagonals: Check `grid[0][0]`, `grid[1][1]`, `grid[2][2]` AND check `grid[0][2]`, `grid[1][1]`, `grid[2][0]`.
-5. If none of these match, return `false`.
+1. Private variables: `Board board`, `Player player1` (always X), `Player player2`.
+2. Constructor takes the board and the two players.
+3. `checkWin(char mark)`: use `board.getCell(r, c)`. Check 3 rows, 3 columns and 2 diagonals. Return true or false.
+4. `play()`:
+   - Set `currentPlayer` to player1.
+   - Loop: print the board, ask `getMove()`, then try `board.placeMark(...)`.
+   - If an exception comes, print its message and ask the same player again. Do NOT change the player.
+   - After a good move: if `checkWin(mark)`, print the board and the winner and return that Player.
+   - If `board.isFull()`, print "Draw" and return null.
+   - Otherwise switch the player.
 
-### PERSON 4: Main Engine
+**How to test your part:** Use two ComputerPlayers and call `play()`. A full game must run and finish.
 
-**What this class is for:** Alternating turns and handling the game loop.
+## PERSON 4: ScoreBoard and Main
+
+**What this class is for:** To start games, keep the score, and show the menu.
+
 **Steps:**
 
-1. Ask the user for game mode: Human vs Human, or Human vs Computer. Create the `Player` objects based on the choice.
-2. Make a `Player currentPlayer = player1;`
-3. Make a `while(true)` loop:
-   * Call `board.printBoard()`.
-   * Ask `currentPlayer` for their move using `int[] move = currentPlayer.getMove();`.
-   * Try to place the mark: `board.placeMark(move[0], move[1], currentPlayer.getMark())`.
-   * **Important:** Put `placeMark` in a `try/catch` block! If an exception is caught, print the error and `continue;` the loop (do NOT switch players, make them try again). If the computer throws an exception (because it randomly guessed a full spot), the loop will just automatically make it guess again.
-   * If successful, call `checkWin()`. If true, print winner and break.
-   * Call `isBoardFull()`. If true, print Draw and break.
-   * Switch player: `if (currentPlayer == player1) currentPlayer = player2; else currentPlayer = player1;`
+1. Class `ScoreBoard`: variables `xWins`, `oWins`, `draws`. Write `recordResult(Player winner)` (null means draw) and `showScore()`.
+2. In `Main`, create ONE `Scanner`.
+3. For a new game: create a new `Board`, the two players, and a `Game`. Call `play()`. Send the result to `recordResult`.
+4. Read the menu choice as text. If it is not a valid number, show a message.
 
-### DEMO: Your group must show these test cases
+**Menu:**
 
-1. Play a full game between two humans where someone gets 3-in-a-row.
-2. During the game, try to place an X on top of an O. Show the `CellOccupiedException` message.
-3. During the game, type row `5` col `5`. Show the `InvalidMoveException` message.
-4. Play a game against the Computer and show it picking moves automatically.
+```
+1. Human vs Human
+2. Human vs Computer
+3. Show score
+4. Stop program
+```
+
+## DEMO: your group must show all 5
+
+1. Play a full game between two humans with a winner.
+2. Place a mark on a used cell. The "cell used" message must show, and the same player must play again.
+3. Type row 5 and col 5. The "invalid move" message must show.
+4. Type letters as a move. The program must not crash.
+5. Play against the computer, then show the score for 2 games.
